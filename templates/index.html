@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Support Tickets</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+
+<body class="bg-slate-50 min-h-screen">
+
+  <nav class="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between shadow-sm">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+      </div>
+      <span class="text-lg font-bold text-slate-800">Customer Support Ticketing CRM System</span>
+    </div>
+    <a href="/create"
+       class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition shadow-sm">
+      + New Ticket
+    </a>
+  </nav>
+
+  <div class="max-w-6xl mx-auto px-8 py-8">
+
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-slate-800">All Tickets</h1>
+      <p class="text-slate-500 text-sm mt-1">Manage and track all customer support requests</p>
+    </div>
+
+    <div class="grid grid-cols-3 gap-5 mb-8">
+
+      <a href="/?status=Open" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex items-center gap-4 hover:shadow-md hover:border-blue-300 transition group">
+        <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="text-3xl font-bold text-blue-600">{{ count_open }}</div>
+          <div class="text-slate-500 text-sm font-medium">Open</div>
+        </div>
+      </a>
+
+      <a href="/?status=In+Progress" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex items-center gap-4 hover:shadow-md hover:border-yellow-300 transition group">
+        <div class="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center group-hover:bg-yellow-100 transition">
+          <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="text-3xl font-bold text-yellow-500">{{ count_in_progress }}</div>
+          <div class="text-slate-500 text-sm font-medium">In Progress</div>
+        </div>
+      </a>
+
+      <a href="/?status=Closed" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex items-center gap-4 hover:shadow-md hover:border-green-300 transition group">
+        <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center group-hover:bg-green-100 transition">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="text-3xl font-bold text-green-600">{{ count_closed }}</div>
+          <div class="text-slate-500 text-sm font-medium">Closed</div>
+        </div>
+      </a>
+
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+
+      <div class="px-6 py-4 border-b border-slate-100 flex gap-3">
+        <form method="GET" class="flex gap-3 w-full">
+          <div class="relative flex-1">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input
+              name="search"
+              placeholder="Search tickets..."
+              value="{{ request.query_params.get('search', '') }}"
+              class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+          </div>
+
+          <select name="status" onchange="this.form.submit()" class="border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">All Statuses</option>
+            <option value="Open" {% if request.query_params.get('status') == 'Open' %}selected{% endif %}>Open</option>
+            <option value="In Progress" {% if request.query_params.get('status') == 'In Progress' %}selected{% endif %}>In Progress</option>
+            <option value="Closed" {% if request.query_params.get('status') == 'Closed' %}selected{% endif %}>Closed</option>
+          </select>
+
+          <select name="priority" onchange="this.form.submit()" class="border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">All Priorities</option>
+            <option value="High" {% if request.query_params.get('priority') == 'High' %}selected{% endif %}>High</option>
+            <option value="Medium" {% if request.query_params.get('priority') == 'Medium' %}selected{% endif %}>Medium</option>
+            <option value="Low" {% if request.query_params.get('priority') == 'Low' %}selected{% endif %}>Low</option>
+          </select>
+
+          <a href="/" class="border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-medium px-4 py-2 rounded-lg transition flex items-center">
+            Clear
+          </a>
+        </form>
+      </div>
+
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-slate-50 border-b border-slate-100 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <th class="px-6 py-3">Ticket ID</th>
+            <th class="px-6 py-3">Customer</th>
+            <th class="px-6 py-3">Subject</th>
+            <th class="px-6 py-3">Priority</th>
+            <th class="px-6 py-3">Status</th>
+            <th class="px-6 py-3">Created</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+
+        {% for ticket in tickets %}
+          <tr class="hover:bg-slate-50 transition">
+
+            <td class="px-6 py-4">
+              <a class="text-blue-600 font-semibold hover:text-blue-800 hover:underline" href="/ticket/{{ ticket.ticket_id }}">
+                {{ ticket.ticket_id }}
+              </a>
+            </td>
+
+            <td class="px-6 py-4">
+              <div class="font-medium text-slate-800">{{ ticket.customer_name }}</div>
+              <div class="text-slate-400 text-xs">{{ ticket.customer_email }}</div>
+            </td>
+
+            <td class="px-6 py-4 text-slate-600">{{ ticket.subject }}</td>
+
+            <td class="px-6 py-4">
+              {% if ticket.priority == "High" %}
+                <span class="bg-orange-50 text-orange-700 border border-orange-200 px-2.5 py-1 rounded-full text-xs font-semibold">High</span>
+              {% elif ticket.priority == "Medium" %}
+                <span class="bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-full text-xs font-semibold">Medium</span>
+              {% else %}
+                <span class="bg-slate-100 text-slate-500 border border-slate-200 px-2.5 py-1 rounded-full text-xs font-semibold">Low</span>
+              {% endif %}
+            </td>
+
+            <td class="px-6 py-4">
+              {% if ticket.status == "Open" %}
+                <span class="bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-full text-xs font-semibold">Open</span>
+              {% elif ticket.status == "In Progress" %}
+                <span class="bg-yellow-50 text-yellow-700 border border-yellow-200 px-2.5 py-1 rounded-full text-xs font-semibold">In Progress</span>
+              {% elif ticket.status == "Closed" %}
+                <span class="bg-green-50 text-green-700 border border-green-200 px-2.5 py-1 rounded-full text-xs font-semibold">Closed</span>
+              {% else %}
+                <span class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full text-xs font-semibold">{{ ticket.status }}</span>
+              {% endif %}
+            </td>
+
+            <td class="px-6 py-4 text-slate-400 text-xs">
+              {{ ticket.created_at.strftime("%b %d, %Y") }}<br>
+              <span class="text-slate-300">{{ ticket.created_at.strftime("%H:%M") }}</span>
+            </td>
+
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="5" class="px-6 py-12 text-center text-slate-400">
+              <svg class="w-10 h-10 mx-auto mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
+              No tickets found
+            </td>
+          </tr>
+        {% endfor %}
+
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+
+</body>
+</html>
